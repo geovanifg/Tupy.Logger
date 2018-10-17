@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tupy;
+using System.Threading.Tasks;
 
 namespace Tupy.Logger
 {
@@ -9,12 +9,9 @@ namespace Tupy.Logger
     {
         private List<IProvider> providers;
 
-        public List<WriteStatus> StatusList { get; private set; }
-
         public ProviderManager()
         {
             providers = new List<IProvider>();
-            StatusList = new List<WriteStatus>();
         }
 
         public IEnumerable<IProvider> List()
@@ -48,40 +45,83 @@ namespace Tupy.Logger
             return result;
         }
 
-        public bool WriteEntry(EventEntry entry)
+        private ExecutionResponse GenerateResponseFromException(IProvider provider, Exception ex)
         {
-            ExecutionResponse response = null;
-            string message = null;
+            var result = new ExecutionResponse(false)
+            {        
+                Source = $"Provider {provider.ID} ({provider.Type.ToString()})",
+                Content = ex.Message
+            };
+            return result;
+        }
 
-            StatusList.Clear();
+        public List<ExecutionResponse> WriteEntry(EventEntry entry)
+        {
+            List<ExecutionResponse> result = null;
+            //Task.Run(async () => { result = await WriteEntryAsync(entry); });
+
+            var a = Task.Run(async () => { result = await WriteEntryAsync(entry); });
+            a.Wait();
+
+            return result;
+        }
+
+        public async Task<List<ExecutionResponse>> WriteEntryAsync(EventEntry entry)
+        {
+            var result = new List<ExecutionResponse>();
+
+            ExecutionResponse response = null;
 
             foreach (var item in providers)
             {
-                message = null;
-
                 try
                 {
-                    response = item.WriteEntry(entry);
+                    response = await item.WriteEntryAsync(entry);
                 }
                 catch (Exception ex)
                 {
-                    response = new ExecutionResponse(false, ex.Message);
+                    response = GenerateResponseFromException(item, ex);
+                    response.Message = $"An error has occurred during log entry writing.";
                 }
 
                 if (response.IsSuccess == false)
                 {
-                    var status = new WriteStatus()
-                    {
-                        ProviderID = item.ID,
-                        ProviderType = item.Type,
-                        Message = message ?? "An error has occurred during log entry writing."
-                    };
-
-                    StatusList.Add(status);
+                    result.Add(response);
                 }
             }
+            return result;
+        }
 
-            bool result = StatusList.Count() > 0;
+        //public List<ExecutionResponse> RemoveBefore(string sourceName, DateTime expirationDate)
+        //{
+        //    List<ExecutionResponse> result = null;
+        //    Task.Run(async () => { result = await RemoveBeforeAsync(sourceName, expirationDate); });
+        //    return result;
+        //}
+
+        public async Task<List<ExecutionResponse>> RemoveBeforeAsync(string sourceName, DateTime expirationDate)
+        {
+            var result = new List<ExecutionResponse>();
+
+            ExecutionResponse response = null;
+
+            foreach (var item in providers)
+            {
+                try
+                {
+                    response = await item.RemoveBeforeAsync(sourceName, expirationDate);
+                }
+                catch (Exception ex)
+                {
+                    response = GenerateResponseFromException(item, ex);
+                    response.Message = $"An error has occurred during remove entryes.";
+                }
+
+                if (response.IsSuccess == false)
+                {
+                    result.Add(response);
+                }
+            }
             return result;
         }
     }

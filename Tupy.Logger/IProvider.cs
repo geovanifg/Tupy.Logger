@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Tupy;
 
 namespace Tupy.Logger
 {
@@ -8,7 +7,9 @@ namespace Tupy.Logger
     {
         ProviderTypes Type { get; }
         string ID { get; set; }
-        ExecutionResponse WriteEntry(EventEntry entry);
-        Task<ExecutionResponse> RemoveBefore(string sourceName, DateTime date);
+        //ExecutionResponse WriteEntry(EventEntry entry);
+        Task<ExecutionResponse> WriteEntryAsync(EventEntry entry);
+        //ExecutionResponse RemoveBefore(string sourceName, DateTime date);
+        Task<ExecutionResponse> RemoveBeforeAsync(string sourceName, DateTime date);
     }
 }

@@ -1,12 +1,25 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Tupy.Logger
 {
     public static class Logger
     {
+        public static List<ExecutionResponse> LastWriteResponses { get; private set; }
+
         public static bool WriteEntry(EventEntry entry)
         {
-            bool result = LoggerOrchestrator.ProviderManager.WriteEntry(entry);
+            bool result = true;
+
+            LastWriteResponses = LoggerOrchestrator.ProviderManager.WriteEntry(entry);
+
+            if (LastWriteResponses.Count> 0)
+            {
+                LoggerOrchestrator.ExecutionErrors.AddRange(LastWriteResponses);
+                result = false;
+            }
+
             return result;
         }
 
@@ -38,6 +51,21 @@ namespace Tupy.Logger
             };
 
             return WriteEntry(entry);
+        }
+
+        public static async Task<bool> WriteEntryAsync(EventEntry entry)
+        {
+            bool result = true;
+
+            LastWriteResponses = await LoggerOrchestrator.ProviderManager.WriteEntryAsync(entry);
+
+            if (LastWriteResponses.Count > 0)
+            {
+                LoggerOrchestrator.ExecutionErrors.AddRange(LastWriteResponses);
+                result = false;
+            }
+
+            return result;
         }
     }
 }

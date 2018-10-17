@@ -4,16 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1E89602A-B09B-4051-8A44-A8C8DD927D6E}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tupy.Logger</RootNamespace>
-    <AssemblyName>Tupy.Logger</AssemblyName>
+    <ProjectGuid>{7C6F6028-B878-4564-912C-F6D32775849F}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>OtherSample</RootNamespace>
+    <AssemblyName>OtherSample</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -42,31 +43,23 @@
     <Reference Include="Tupy, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Tupy.1.0.1\lib\net45\Tupy.dll</HintPath>
     </Reference>
-    <Reference Include="Tupy.Extensions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Tupy.Extensions.1.0.0\lib\net45\Tupy.Extensions.dll</HintPath>
-    </Reference>
     <Reference Include="Tupy.Jobs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Tupy.Jobs.1.0.1\lib\net45\Tupy.Jobs.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enums.cs" />
-    <Compile Include="EventEntry.cs" />
-    <Compile Include="EventSource.cs" />
-    <Compile Include="EventSourceManager.cs" />
-    <Compile Include="IProvider.cs" />
-    <Compile Include="Logger.cs" />
-    <Compile Include="LoggerOrchestrator.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ProviderManager.cs" />
-    <Compile Include="Providers\EventViewerProvider.cs" />
-    <Compile Include="Providers\Settings.cs" />
-    <Compile Include="Providers\TextFileProvider.cs" />
-    <Compile Include="ScheduleManager.cs" />
-    <Compile Include="ProviderInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tupy.Logger\Tupy.Logger.csproj">
+      <Project>{1e89602a-b09b-4051-8a44-a8c8dd927d6e}</Project>
+      <Name>Tupy.Logger</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

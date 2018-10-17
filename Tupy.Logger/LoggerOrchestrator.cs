@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tupy;
 using Tupy.Jobs;
 
 namespace Tupy.Logger
 {
     public static class LoggerOrchestrator
     {
+        private static JobManager jobManager = new JobManager();
         private static EventSourceManager EventSourceManager { get; set; } = new EventSourceManager();
         public static ProviderManager ProviderManager { get; set; } = new ProviderManager();
         public static List<ExecutionResponse> ExecutionErrors { get; set; } = new List<ExecutionResponse>();
+
+        //public Action<ExecutionResponse> ReportStatus { get; set; }
 
         public static void AddEventSource(EventSource e)
         {
@@ -23,46 +25,30 @@ namespace Tupy.Logger
                 job.StepAction = async delegate () 
                 {
                     var expiration = DateTime.Now;
-                    ExecutionResponse response = null;
 
-                    foreach (var provider in ProviderManager.List())
+                    var responses = await ProviderManager.RemoveBeforeAsync(e.Name, expiration);
+
+                    if (responses.Count > 0)
                     {
-                        try
-                        {
-                            response = await provider.RemoveBefore(e.Name, expiration);
-                        }
-                        catch (Exception ex)
-                        {
-                            response = new ExecutionResponse(false)
-                            {
-                                Message = $"Provider {provider.ID} ({provider.Type.ToString()}) RemoveBefor error.",
-                                Content = ex.Message
-                            };
-                        }
-
-                        // If execution error, then add in the list
-                        if (response.IsSuccess == false)
-                        {
-                            ExecutionErrors.Add(response);
-                        }
+                        ExecutionErrors.AddRange(responses);
                     }
                 };
                 job.Schedule.FrequencyOption = e.RetentionPeriodoType;
                 job.Schedule.FrequencyInterval = e.MinimumRetention;
 
-                JobManager.Jobs.Add(job);
+                jobManager.Jobs.Add(job);
             }
         }
 
         public static void Start()
         {
             ExecutionErrors.Clear();
-            JobManager.Start();
+            jobManager.Start();
         }
 
         public static void Stop()
         {
-            JobManager.Stop();
+            jobManager.Stop();
         }
     }
 }

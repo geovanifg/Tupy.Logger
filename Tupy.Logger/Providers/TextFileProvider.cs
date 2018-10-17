@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Tupy;
 using Tupy.Extensions;
 
 namespace Tupy.Logger.Providers
@@ -182,7 +183,7 @@ namespace Tupy.Logger.Providers
         {
             var list = new List<string>
             {
-                entry.TimeGenerated.ToStringFull("-"),
+                entry.TimeGenerated.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
                 entry.Source,
                 entry.EntryType.ToString(),
                 entry.Message,
@@ -192,20 +193,33 @@ namespace Tupy.Logger.Providers
                 entry.UserName
             };
 
-            var result = list.Select(r => r + ";").ToString();
+
+
+            //var result = list.Select(r => r + ";").ToString();
+            var result = string.Join(";", list);
 
             return result;
         }
 
-        private ExecutionResponse WriteLog(string content, string filePath)
+        private async Task<ExecutionResponse> WriteLogAsync(string content, string filePath)
         {
             ExecutionResponse result = new ExecutionResponse(false, "Não foi escrever no arquivo.");
 
             try
             {
-                File.AppendAllLines(filePath, new string[] { content });
+                //await Task.Run(() =>
+                //{
+                //    File.AppendAllLines(filePath, new string[] { content });
+                //    result = new ExecutionResponse(true);
+                //});
 
-                result = new ExecutionResponse(true);
+                ////byte[] encodedText = Encoding.Unicode.GetBytes(text);
+                byte[] encodedText = Encoding.UTF8.GetBytes(content);
+
+                using (FileStream source = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
+                {
+                    await source.WriteAsync(encodedText, 0, encodedText.Length);
+                };
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -235,7 +249,7 @@ namespace Tupy.Logger.Providers
             return result;
         }
 
-        public ExecutionResponse WriteEntry(EventEntry entry)
+        public async Task<ExecutionResponse> WriteEntryAsync(EventEntry entry)
         {
             var folderpath = GetSourceFolder(entry.Source);
             var filepath = GetCompleteFileName(entry.Source, entry.TimeGenerated);
@@ -245,14 +259,14 @@ namespace Tupy.Logger.Providers
             if (!result.IsSuccess)
                 return result;
 
-            result = CheckFile(filepath);
+            //result = CheckFile(filepath);
 
-            if (!result.IsSuccess)
-                return result;
+            //if (!result.IsSuccess)
+            //    return result;
 
             var line = FormatLine(entry);
 
-            result = WriteLog(line, filepath);
+            result = await WriteLogAsync(line, filepath);
 
             return result;
         }
@@ -301,7 +315,7 @@ namespace Tupy.Logger.Providers
             return result;
         }
 
-        public async Task<ExecutionResponse> RemoveBefore(string sourceName, DateTime date)
+        public async Task<ExecutionResponse> RemoveBeforeAsync(string sourceName, DateTime date)
         {
             ExecutionResponse result = null;
 

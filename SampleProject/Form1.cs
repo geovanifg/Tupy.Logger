@@ -52,6 +52,11 @@ namespace SampleProject
             LoggerOrchestrator.Start();
         }
 
+        private void AutoLogWrite()
+        {
+
+        }
+
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             LoggerOrchestrator.Stop();
