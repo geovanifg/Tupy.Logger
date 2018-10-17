@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Tupy.Extensions;
 
@@ -21,11 +20,11 @@ namespace Tupy.Logger.Providers
         private DateTime? DecomposeFileName(string name)
         {
             DateTime? result = null;
-            //if (name.StartsWith(PREFIX) && name.Length == 16 && name.EndsWith(EXTENSION))
+
             if (name.Length == 16)
             {
                 var text = name.Substring(PREFIX.Length, 8);
-                if (DateTime.TryParse(text, out DateTime date))
+                if (DateTime.TryParseExact(text, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date))
                 {
                     result = date;
                 }
@@ -193,8 +192,6 @@ namespace Tupy.Logger.Providers
                 entry.UserName
             };
 
-
-
             //var result = list.Select(r => r + ";").ToString();
             var result = string.Join(";", list);
 
@@ -207,19 +204,19 @@ namespace Tupy.Logger.Providers
 
             try
             {
-                //await Task.Run(() =>
-                //{
-                //    File.AppendAllLines(filePath, new string[] { content });
-                //    result = new ExecutionResponse(true);
-                //});
+                await Task.Run(() =>
+                {
+                    File.AppendAllLines(filePath, new string[] { content });
+                    result = new ExecutionResponse(true);
+                });
 
                 ////byte[] encodedText = Encoding.Unicode.GetBytes(text);
-                byte[] encodedText = Encoding.UTF8.GetBytes(content);
+                //byte[] encodedText = Encoding.UTF8.GetBytes(content);
 
-                using (FileStream source = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
-                {
-                    await source.WriteAsync(encodedText, 0, encodedText.Length);
-                };
+                //using (FileStream source = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
+                //{
+                //    await source.WriteAsync(encodedText, 0, encodedText.Length);
+                //};
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -259,10 +256,10 @@ namespace Tupy.Logger.Providers
             if (!result.IsSuccess)
                 return result;
 
-            //result = CheckFile(filepath);
+            result = CheckFile(filepath);
 
-            //if (!result.IsSuccess)
-            //    return result;
+            if (!result.IsSuccess)
+                return result;
 
             var line = FormatLine(entry);
 
@@ -282,9 +279,11 @@ namespace Tupy.Logger.Providers
             string completepath = null;
 
             var files = Directory
-                .EnumerateFiles(folderPath, "*.*", SearchOption.AllDirectories)
-                .Where(r => r.StartsWith(PREFIX) && r.EndsWith(EXTENSION))
+                .EnumerateFiles(folderPath, PREFIX + "*.txt", SearchOption.TopDirectoryOnly)
+                .Select(r => r.Substring(folderPath.Length + 1))
+                .ToList()
                 .OrderBy(r => r);
+
 
             foreach (var item in files)
             {

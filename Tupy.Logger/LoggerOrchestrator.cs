@@ -17,27 +17,33 @@ namespace Tupy.Logger
         {
             if (EventSourceManager.Add(e))
             {
-                var job = new Job()
-                {
-                    Name = e.Name + " clean job"
-                };
-
-                job.StepAction = async delegate () 
-                {
-                    var expiration = DateTime.Now;
-
-                    var responses = await ProviderManager.RemoveBeforeAsync(e.Name, expiration);
-
-                    if (responses.Count > 0)
-                    {
-                        ExecutionErrors.AddRange(responses);
-                    }
-                };
-                job.Schedule.FrequencyOption = e.RetentionPeriodoType;
-                job.Schedule.FrequencyInterval = e.MinimumRetention;
-
-                jobManager.Jobs.Add(job);
+                if (e.MinimumRetention > 0)
+                    AddJob(e);
             }
+        }
+
+        private static void AddJob(EventSource e)
+        {
+            var job = new Job()
+            {
+                Name = e.Name + " clean job"
+            };
+
+            job.StepAction = async delegate ()
+            {
+                var expiration = DateTime.Now;
+
+                var responses = await ProviderManager.RemoveBeforeAsync(e.Name, expiration);
+
+                if (responses.Count > 0)
+                {
+                    ExecutionErrors.AddRange(responses);
+                }
+            };
+            job.Schedule.FrequencyOption = e.RetentionPeriodoType;
+            job.Schedule.FrequencyInterval = e.MinimumRetention;
+
+            jobManager.Jobs.Add(job);
         }
 
         public static void Start()

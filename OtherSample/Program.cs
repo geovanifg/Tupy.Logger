@@ -136,7 +136,7 @@ namespace OtherSample
                 Name = "Job Information",
                 StepAction = delegate ()
                 {
-                    WriteWarningLog();
+                    WriteInfoLog();
                 },
                 ReportStatus = Display
             };
