@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{576D5605-6A75-47C3-A149-DE3C1DC9BF1A}"
 	ProjectSection(SolutionItems) = preProject
 		TextFile1.txt = TextFile1.txt
+		Tupy.Logger\Tupy.Logger.nuspec = Tupy.Logger\Tupy.Logger.nuspec
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tupy.Logger", "Tupy.Logger\Tupy.Logger.csproj", "{1E89602A-B09B-4051-8A44-A8C8DD927D6E}"

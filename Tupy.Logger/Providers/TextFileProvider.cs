@@ -8,7 +8,7 @@ using Tupy.Extensions;
 
 namespace Tupy.Logger.Providers
 {
-    public class TextFileProvider : IProvider
+    public class TextFileProvider : FileBasedProvider, IProvider
     {
         private const string PREFIX = "Log-";
         private const string EXTENSION = ".txt";
@@ -56,86 +56,6 @@ namespace Tupy.Logger.Providers
             var completepath = Path.Combine(filepath, filename);
 
             return completepath;
-        }
-
-        private ExecutionResponse CheckFolder(string folderPath)
-        {
-            ExecutionResponse result = new ExecutionResponse(false, "Não foi possível criar a pasta.");
-
-            try
-            {
-                if (!Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
-                result = new ExecutionResponse(true);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                result.Content = ex.Message;
-            }
-            catch (ArgumentNullException ex)
-            {
-                result.Content = ex.Message;
-            }
-            catch (PathTooLongException ex)
-            {
-                result.Content = ex.Message;
-            }
-            catch (DirectoryNotFoundException ex)
-            {
-                result.Content = ex.Message;
-            }
-            catch (IOException ex)
-            {
-                result.Content = ex.Message;
-            }
-            catch (Exception ex)
-            {
-                result.Content = ex.Message;
-            }
-
-            return result;
-        }
-
-        private ExecutionResponse CheckFile(string completePath)
-        {
-            ExecutionResponse result = new ExecutionResponse(false, "Não foi possível criar o arquivo.");
-
-            try
-            {
-                if (!File.Exists(completePath))
-                {
-                    File.Create(completePath);
-                }
-                result = new ExecutionResponse(true);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                result.Content = ex.Message;
-            }
-            catch (ArgumentNullException ex)
-            {
-                result.Content = ex.Message;
-            }
-            catch (PathTooLongException ex)
-            {
-                result.Content = ex.Message;
-            }
-            catch (DirectoryNotFoundException ex)
-            {
-                result.Content = ex.Message;
-            }
-            catch (IOException ex)
-            {
-                result.Content = ex.Message;
-            }
-            catch (Exception ex)
-            {
-                result.Content = ex.Message;
-            }
-
-            return result;
         }
 
         private async Task<ExecutionResponse> DeleteFileAsync(string completePath)

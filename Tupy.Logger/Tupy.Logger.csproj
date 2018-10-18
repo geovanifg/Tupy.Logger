@@ -60,6 +60,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProviderManager.cs" />
     <Compile Include="Providers\EventViewerProvider.cs" />
+    <Compile Include="Providers\FileBasedProvider.cs" />
     <Compile Include="Providers\Settings.cs" />
     <Compile Include="Providers\TextFileProvider.cs" />
     <Compile Include="ScheduleManager.cs" />
