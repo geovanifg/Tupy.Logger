@@ -59,22 +59,22 @@ namespace OtherSample
 
             var srcinfinite = new EventSource()
             {
-                Name = "InfiniteRetentionPeriod",
+                Name = "RetentionPeriod:Infinite",
                 MinimumRetention = 0
             };
 
             var src5minutes = new EventSource()
             {
-                Name = "FiveMinutes",
+                Name = "RetentionPeriod:FiveMinutes",
                 MinimumRetention = 5,
                 RetentionPeriodoType = FrequencyOptions.Minute
             };
 
             var src1hour = new EventSource()
             {
-                Name = "OneHour",
-                MinimumRetention = 5,
-                RetentionPeriodoType = FrequencyOptions.Minute
+                Name = "RetentionPeriod:OneHour",
+                MinimumRetention = 1,
+                RetentionPeriodoType = FrequencyOptions.Hour
             };
 
             LoggerOrchestrator.AddEventSource(srcinfinite);

@@ -102,7 +102,8 @@ namespace Tupy.Logger.Providers
         {
             var list = new List<string>
             {
-                entry.TimeGenerated.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
+                //entry.TimeGenerated.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
+                entry.TimeGenerated.ToStringFull(),
                 entry.Source,
                 entry.EntryType.ToString(),
                 entry.Message,
@@ -169,7 +170,7 @@ namespace Tupy.Logger.Providers
         public async Task<ExecutionResponse> WriteEntryAsync(EventEntry entry)
         {
             var folderpath = GetSourceFolder(entry.Source);
-            var filepath = GetCompleteFileName(entry.Source, entry.TimeGenerated);
+            var filepath = GetCompleteFileName(entry.Source, entry.TimeGenerated.Date);
 
             var result = CheckFolder(folderpath);
 
